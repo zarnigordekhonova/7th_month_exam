@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if user.is_authenticated %}
+<h2>Start Messaging</h2>
+<h3 class="home-heading">Shaxsiy chatlar</h3>
+    {% for user in users %}
+       <i class="fas fa-user"></i> <a href="{% url 'chat:to_user' user.pk %}">{{ user.username }}</a><br>
+    {% endfor %}
+{% else %}
+    <h2>Start Messaging</h2>
+{% endif %}
+{% endblock %}

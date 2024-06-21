@@ -1,0 +1,26 @@
+{% if messages %}
+    <div id="messages" class="fixed-top mt-3 mx-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" style="background-color: lightgreen;">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<script>
+    // Auto-close messages after 2 seconds
+    setTimeout(function() {
+        var alertElements = document.querySelectorAll('.alert');
+        alertElements.forEach(function(alertElement) {
+            alertElement.classList.remove('show');
+            alertElement.classList.add('fade'); // Add 'fade' class for Bootstrap fade animation
+            setTimeout(function() {
+                alertElement.remove(); // Remove the alert element after fade-out animation
+            }, 1000); // Remove after 1 second (adjust as needed)
+        });
+    }, 2000);
+</script>

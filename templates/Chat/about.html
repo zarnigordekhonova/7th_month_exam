@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %} Biz haqimizda {% endblock %}
+
+{% block content %}
+<body>
+<h2>My Messanger haqida</h2>
+<p>Ushbu sayt Python dasturlash tilining Django freymvorki asosida, Dekhonova Zarnigor tomonidan ishlab chiqildi.</p>
+<p>Saytda foydalanuvchi boshqa foydalanuvchilar o'zaro aloqa qilish imkoniyatiga ega.<br>
+Ya'ni foydalanuvchilar bir-birlariga tekst-xabarlar yoki fayl ko'rinishidagi xabarlarni jo'nata olishi mumkin.</p>
+
+<p>Loyihani ishlab chiqishda:
+<br>
+- django;<br>
+- pillow;<br>
+- jazzmin kutubxonalaridan foydalanildi.</p>
+<br>
+<a href="{% url 'chat:homepage' %}">Asosiy sahifa</a>
+</body>
+{% endblock %}

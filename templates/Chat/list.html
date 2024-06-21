@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Homepage</title>
+</head>
+<body>
+<section class="home-section">
+    <h2 class="home-heading">Users</h2>
+        <ul class="user-list">
+            {% for user in users %}
+                <li><a href="#">{{ user.username }}</a></li>
+            {% endfor %}
+        </ul>
+</section>
+</body>
+</html>

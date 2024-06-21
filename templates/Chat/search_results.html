@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+  {% if followers %}
+    <ul>
+      {% for follower in followers %}
+        <li>
+          <a href="{% url 'users:profile' follower.username %}">{{ follower.username }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No users found </p>
+  {% endif %}
+{% endblock %}

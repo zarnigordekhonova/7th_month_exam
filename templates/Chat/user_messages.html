@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% block title %}{{ user.username }}{% endblock %}
+{% block extra_head %}
+{% load static %}
+    <style>
+        body {
+            margin: 0;
+            font-family: Times New Roman;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensure full height of viewport */
+        }
+
+        .chat-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden; /* Prevent overflow of container */
+            position: relative; /* Ensure relative positioning */
+        }
+
+        .user-list {
+            width: 25%;
+            border-right: 2px solid #ccc;
+            padding: 10px;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+
+        }
+
+        .user-list ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .user-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .user-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .user-info {
+            flex-grow: 1;
+        }
+
+        .last-message {
+            font-size: 0.8em;
+            color: gray;
+            margin-top: 5px;
+        }
+
+        .chat-area {
+            width: 75%;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto; /* Ensure messages scroll */
+            position: relative; /* Ensure relative positioning */
+            margin-left: auto; /* Adjusted to align with user list */
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chat-header img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .messages-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1; /* Allow messages list to expand */
+            overflow-y: auto; /* Enable vertical scrolling */
+            margin-bottom: 0; /* No margin bottom to eliminate extra space */
+        }
+
+        .message {
+            max-width: 60%;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .message.sent {
+            background-color: #d1e7dd;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.received {
+            background-color: #f8d7da;
+            margin-right: auto;
+            text-align: left;
+        }
+
+        .message p {
+            margin: 0;
+        }
+
+        .message small {
+            font-size: 0.7em;
+            color: #888;
+        }
+
+        .footer {
+            height: 50px; /* Adjusted height for the footer */
+            background-color: #f1f1f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed; /* Fixed positioning to stay at the bottom */
+            bottom: 0;
+            width: 100%; /* Span the entire width */
+            z-index: 1000; /* Ensure footer is above message form */
+        }
+
+        .footer span {
+            text-align: center;
+            color: #888;
+        }
+
+        .message-form {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            position: fixed; /* Fixed positioning to stay within the viewport */
+            bottom: 18px; /* Adjusted to ensure it's above the footer */
+            left: calc(32% + 1px); /* Adjusted to align with the chat area */
+            width: calc(68% - 1px); /* Adjusted to span the width of the chat area */
+
+        }
+
+        .attachment-input {
+            display: none;
+        }
+
+        .attachment-label {
+            cursor: pointer;
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .message-form textarea {
+            flex-grow: 1;
+            margin-right: 10px;
+            height: 40px; /* Height of the text input */
+            resize: none;
+            border: 1px solid #ccc; /* Optional: Add border for clarity */
+            border-radius: 5px; /* Optional: Add border radius */
+            padding: 5px; /* Optional: Add padding */
+        }
+
+        .send-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .send-button:hover {
+            color: #0056b3;
+        }
+        .edit-message-link, .delete-button {
+            margin-left: 5px;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .edit-message-link:hover, .delete-button:hover {
+            color: #0056b3;
+        }
+
+        .delete-button {
+            background: none;
+            border: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="chat-container">
+        <div class="user-list">
+            <h3>Foydalanuvchilar</h3>
+            <div class="search-form">
+                <form action="#" method="get" style="display: inline;">
+                    <input type="search" name="q" placeholder="Qidiruv..." required>
+                </form>
+            </div>
+            <ul>
+                {% for other_user, last_message in user_last_messages %}
+                <li class="user-item">
+                    <img src="{{ other_user.image.url }}" alt="{{ other_user.username }}" class="user-image">
+                    <div class="user-info">
+                        <a href="{% url 'chat:to_user' pk=other_user.id %}">{{ other_user.username }}</a>
+                        <p class="last-message">
+                            {{ last_message.text|truncatewords:10 }}
+                        </p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Main chat area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <img src="{{ user.image.url }}" alt="{{ user.username }}" class="user-image">
+                <h2>{{ user.username }}</h2>
+            </div>
+            <ul class="messages-list">
+                {% for message in send_message|dictsort:"created_at" %}
+                <li class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                    <p>{{ message.text }}</p>
+                    {% if message.attachment %}
+                        <p><a href="{{ message.attachment.url }}"><i class="fas fa-download"></i></a></p>
+                    {% endif %}
+                    <p><small>Xabar {{ message.sender.username }} tomonidan {{ message.created_at }} da jo'natildi.</small></p>
+                    {% if message.sender == request.user %}
+                    <a href="{% url 'chat:edit' message.pk %}" class="edit-message-link">
+                        <i class="fas fa-pencil-alt"></i>
+                    </a>
+                    <form action="{% url 'chat:delete' pk=message.pk %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="delete-button">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                </li>
+                {% empty %}
+                <li>Ushbu chatda xabarlar yo'q.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Message form at the bottom -->
+<form method="post" enctype="multipart/form-data" class="message-form">
+    {% csrf_token %}
+    <input type="file" name="attachment" id="attachment" class="attachment-input">
+    <label for="attachment" class="attachment-label">
+        <i class="fas fa-paperclip"></i>
+    </label>
+    <textarea name="text" placeholder="Xabar yozing..." required></textarea>
+    <button type="submit" class="send-button">
+        <i class="fas fa-paper-plane"></i>
+    </button>
+</form>
+
+<footer class="footer">
+    <div class="container d-flex justify-content-center align-items-center h-100">
+        <span class="text-muted text-center">&copy; 2024 My Site. Barcha huquqlar himoyalangan.</span>
+    </div>
+</footer>
+{% endblock %}
+
+
